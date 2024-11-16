@@ -65,6 +65,36 @@ class Engine:
                         return True
         return False
     
+    def evaluate(self, color):
+        evaluation = 0
+
+        for i in range(BOARD_ROW * BOARD_COLUMN):
+            row, col = get_row_col(i)
+                
+            #if we found a piece
+            if self.board[row][col] == color:
+                #check directions
+                for dir in DIRECTIONS:
+                    piece_connected = 1
+                    new_row, new_col = row, col
+                    for _ in range(4):
+                        new_row -= dir[0]
+                        new_col -= dir[1]
+
+                        #check if out of bounds
+                        if (new_row < 0 or new_row >= BOARD_ROW) or \
+                            (new_col < 0 or new_col >= BOARD_COLUMN):
+                            break
+                        #check if the same piece
+                        if self.board[new_row][new_col]==color:
+                            piece_connected+=1
+                        else:
+                            break
+                    
+                    evaluation += piece_connected
+                    
+        return piece_connected
+    
     def get_reverse_side(self):
         if self.side==WHITE:
             return BLACK
