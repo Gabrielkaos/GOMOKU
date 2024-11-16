@@ -1,21 +1,15 @@
+from .constants import *
 
 
-EMPTY = 0
-WHITE = 1
-BLACK = 2
-BOARD_ROW    = 15
-BOARD_COLUMN = 15
-PIECE_CHAR = {EMPTY:".", WHITE:"w", BLACK:"b"}
-DIRECTIONS = [
-    (1,0), #down
-    (-1,0), #up
-    (0,1), #right
-    (0,-1), #left
-    (1,1), #SE
-    (-1,1), #NE
-    (-1,-1), #NW
-    (1,-1) #SW
-]
+
+
+def get_row_col(square):
+    if not 0 <= square <= BOARD_ROW * BOARD_COLUMN:
+        raise ValueError(f"Square number must be between 0 and {BOARD_ROW * BOARD_COLUMN}.")
+    row = square // BOARD_ROW
+    col = square % BOARD_COLUMN
+    
+    return row, col
 
 
 class Undo:
@@ -32,35 +26,32 @@ class Engine:
         self.history_of_moves = [Undo() for _ in range(BOARD_ROW*BOARD_COLUMN)]
 
     def is_winning(self, color):
-        for row in range(BOARD_ROW):
-            for col in range(BOARD_COLUMN):
+        for i in range(BOARD_ROW * BOARD_COLUMN):
+            row, col = get_row_col(i)
                 
-                #if we found a piece
-                if self.board[row][col] == color:
-                    #check directions
-                    for dir in DIRECTIONS:
-                        piece_connected = 1
-                        new_row, new_col = row, col
-                        for _ in range(4):
-                            new_row -= dir[0]
-                            new_col -= dir[1]
+            #if we found a piece
+            if self.board[row][col] == color:
+                #check directions
+                for dir in DIRECTIONS:
+                    piece_connected = 1
+                    new_row, new_col = row, col
+                    for _ in range(4):
+                        new_row -= dir[0]
+                        new_col -= dir[1]
 
-                            #check if out of bounds
-                            if (new_row < 0 or new_row >= BOARD_ROW) or \
-                                (new_col < 0 or new_col >= BOARD_COLUMN):
-                                break
-                            #check if the same piece
-                            if self.board[new_row][new_col]==color:
-                                piece_connected+=1
-                            else:
-                                break
-                        
-                        if piece_connected==5:
-                            return True
+                        #check if out of bounds
+                        if (new_row < 0 or new_row >= BOARD_ROW) or \
+                            (new_col < 0 or new_col >= BOARD_COLUMN):
+                            break
+                        #check if the same piece
+                        if self.board[new_row][new_col]==color:
+                            piece_connected+=1
+                        else:
+                            break
+                    
+                    if piece_connected==5:
+                        return True
         return False
-
-
-
 
     def _reverse_side(self):
         if self.side==WHITE:
@@ -105,14 +96,6 @@ class Engine:
 
         else:
             raise Exception("No moves made")
-
-def get_row_col(square):
-    if not 0 <= square <= BOARD_ROW * BOARD_COLUMN:
-        raise ValueError(f"Square number must be between 0 and {BOARD_ROW * BOARD_COLUMN}.")
-    row = square // 8
-    col = square % 8
-    
-    return row, col
 
 
 
